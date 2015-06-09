@@ -25,7 +25,7 @@ scarenren是一个基于scala的人人分析工具
 程序最主要的类是在renren.scala中，首先程序会读取在`userinfo.ini`中的用户名密码，然后取得用户的好友列表，最后根据好友列表，生成好友关系图。样例如下，名字已经全部和谐Orz
 
 <figure>
-	<img src="./example.png" height="300">
+	<img src="./example.png" height="450">
 </figure>
 
 在根据好友列表生成好友关系图的时候，使用了Actor来并发地处理请求，但是因为从未接触过这种线程模型，代码不太靠谱，有时候会有一些bug，这里的建议是多次执行以期望能得到成功的一次= =
