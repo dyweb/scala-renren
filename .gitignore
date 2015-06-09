@@ -1,8 +1,6 @@
 target/
 Output*
 .java-version
-*.txt
-*.png
-*.pdf
-*.svg
+headless_simple.* 
 userinfo.ini
+network.txt
