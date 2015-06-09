@@ -12,8 +12,8 @@ scarenren是一个基于scala的人人分析工具
 
 ## 功能
 
-1. 好友学校统计，在生成的<Output-Data.txt>中
-2. 好友关系图，在生成的<headless_simple.png>和<headless_simple.png>中
+1. 好友学校统计，在生成的`Output-Data.txt`中
+2. 好友关系图，在生成的`headless_simple.png`和`headless_simple.png`中
 3. 待续
 
 ## 使用
@@ -22,7 +22,7 @@ scarenren是一个基于scala的人人分析工具
 
 ## 代码阅读指南（程序执行指南）
 
-程序最主要的类是在renren.scala中，首先程序会读取在<userinfo.ini>中的用户名密码，然后取得用户的好友列表，最后根据好友列表，生成好友关系图。样例如下，名字已经全部和谐Orz
+程序最主要的类是在renren.scala中，首先程序会读取在`userinfo.ini`中的用户名密码，然后取得用户的好友列表，最后根据好友列表，生成好友关系图。样例如下，名字已经全部和谐Orz
 
 <figure>
 	<img src="./example.png" height="300">
