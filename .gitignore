@@ -1,0 +1,8 @@
+target/
+Output*
+.java-version
+*.txt
+*.png
+*.pdf
+*.svg
+userinfo.ini
