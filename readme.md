@@ -20,6 +20,19 @@ scarenren是一个基于scala的人人分析工具
 
 编译并运行需要指令`sbt run`，代码只在os x环境下使用过，不知道其他系统会不会有问题，第一次编译可能需要时间比较长，需要下载各种库，之后会快很多。
 
+PS: gephi在导出的时候，会有报错，形如
+	
+	java.lang.InterruptedException: sleep interrupted
+		at java.lang.Thread.sleep(Native Method)
+		at org.gephi.data.attributes.event.AttributeEventManager.run(AttributeEventManager.java:87)
+		at java.lang.Thread.run(Thread.java:745)
+	java.lang.InterruptedException
+		at java.lang.Object.wait(Native Method)
+		at java.lang.Object.wait(Object.java:503)
+		at org.gephi.graph.dhns.core.GraphStructure$ViewDestructorThread.run(GraphStructure.java:240)
+
+但是对结果没有影响，run的结果还会是success。这些异常似乎catch不住，有待解决。
+
 ## 代码阅读指南（程序执行指南）
 
 程序最主要的类是在renren.scala中，首先程序会读取在`userinfo.ini`中的用户名密码，然后取得用户的好友列表，最后根据好友列表，生成好友关系图。样例如下，名字已经全部和谐Orz
