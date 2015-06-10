@@ -100,7 +100,7 @@ class Grapher(val network: HashMap[Friend, List[Friend]]) {
 		// println(network)
 		for( (k, _) <- network) {
 			var n0 = graphModel.factory().newNode(k.uid)
-			n0.getNodeData().setLabel("高策")
+			n0.getNodeData().setLabel(k.name)
 			nodes(k) = n0
 			directedGraph.addNode(n0)
 		}
@@ -150,14 +150,18 @@ class Grapher(val network: HashMap[Friend, List[Friend]]) {
 		model.getProperties().putValue(PreviewProperty.NODE_LABEL_FONT, model.getProperties().getFontValue(PreviewProperty.NODE_LABEL_FONT).deriveFont(8))
 
 		//Export
-		var ec = Lookup.getDefault().lookup(classOf[ExportController])
-		val pe = new PNGExporter
-		// pe.setHeight(height)
-		// pe.setWidth(width)
-		// pe.setMargin(0)
-		ec.exportFile(new File("headless_simple.png"), pe)
-		val ps = new SVGExporter
-		ec.exportFile(new File("headless_simple.svg"), ps)
+		// try { 
+			var ec = Lookup.getDefault().lookup(classOf[ExportController])
+			val pe = new PNGExporter
+			// pe.setHeight(height)
+			// pe.setWidth(width)
+			// pe.setMargin(0)
+			ec.exportFile(new File("headless_simple.png"), pe)
+			val ps = new SVGExporter
+			ec.exportFile(new File("headless_simple.svg"), ps)
+		// } catch {
+		//   case e: Exception => 
+		// }
 
 	}
 }
