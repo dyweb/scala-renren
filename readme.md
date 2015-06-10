@@ -13,7 +13,7 @@ scarenren是一个基于scala的人人分析工具
 ## 功能
 
 1. 好友学校统计，在生成的`Output-Data.txt`中
-2. 好友关系图，在生成的`headless_simple.png`和`headless_simple.png`中
+2. 好友关系图，在生成的`headless_simple.png`和`headless_simple.svg`中
 3. 待续
 
 ## 使用
