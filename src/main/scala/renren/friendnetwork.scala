@@ -185,14 +185,14 @@ class FriendNetwork(reporter: Reporter) {
 					case "Finish" => 
 					sender ! "ready"
 					reporter.info("actor exit")
-					flag = false
+					// flag = false
 					exit()
 				}
 			}
 		}
 	}
 
-	class SuperActor(thread: Int, var list: List[(Friend, List[Friend])], renren: Renren) extends Actor {
+	class SuperActor(thread: Int, var list: List[Friend], renren: Renren) extends Actor {
 		var actorList: List[FriendActor] = List()
 		var flag = true
 		var times = 50
@@ -213,7 +213,7 @@ class FriendNetwork(reporter: Reporter) {
 					case "end" => 
 					if (list.size != 0 && times != 0) {
 						times = times - 1
-						sender ! list.head._1
+						sender ! list.head
 						list = list.tail
 					}
 					else {
@@ -236,6 +236,20 @@ class FriendNetwork(reporter: Reporter) {
 			}
 		}
 	}
+
+	def mapFunc(renren: Renren, ele: Friend) = {
+		var workUid = ele.uid
+		// tricky
+		if (renren.getFriendCount(workUid) < 1000) {
+			var friList: List[Friend] = me.translate2Friend(renren.getFriendList(workUid))
+			for( friend <- friList) {
+				if (me.network.exists(_._1 == friend)) {
+					me.network(ele) = friend :: me.network(ele)
+				}
+			}
+		}
+		ele
+	}
 	
 	// parse all the friend you have and get the network
 	def parseFriend(renren: Renren, thread: Int): Unit = {
@@ -243,10 +257,13 @@ class FriendNetwork(reporter: Reporter) {
 			return
 		}
 		val me = this
-		var list = network.toList
+		var list = network.keySet.toList
 
 		val superActor: SuperActor = new SuperActor(thread, list, renren)
 		superActor.start ! "begin"
+		// list.par.map {
+		// 	ele => mapFunc(renren, ele)
+		// }
 		return
 	}
 
