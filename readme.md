@@ -35,13 +35,11 @@ PS: gephi在导出的时候，会有报错，形如
 
 ## 代码阅读指南（程序执行指南）
 
-程序最主要的类是在renren.scala中，首先程序会读取在`userinfo.ini`中的用户名密码，然后取得用户的好友列表，最后根据好友列表，生成好友关系图。样例如下，名字已经全部和谐Orz
+程序最主要的类是在renren.scala中，首先程序会读取在`userinfo.ini`中的用户名密码，然后取得用户的好友列表，最后根据好友列表，生成好友关系图。样例如下，原本是带有名字标签在图上的，但为了保护隐私，已和谐。
 
 <figure>
-	<img src="http://gaocegege.com/scala-renren/headless_simple.svg" height="450">
+	<img src="http://gaocegege.com/scala-renren/example.png" height="450">
 </figure>
-
-请去[http://gaocegege.com/scala-renren/headless_simple.svg](http://gaocegege.com/scala-renren/headless_simple.svg)查看原图，会清楚些。
 
 在根据好友列表生成好友关系图的时候，使用了Actor来并发地处理请求，但是因为从未接触过这种线程模型，代码不太靠谱，有时候会有一些bug，这里的建议是多次执行以期望能得到成功的一次= =
 
