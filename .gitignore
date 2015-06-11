@@ -1,6 +1,5 @@
 target/
 Output*
 .java-version
-headless_simple.* 
 userinfo.ini
 network.txt
