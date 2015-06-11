@@ -100,7 +100,7 @@ class Grapher(val network: HashMap[Friend, List[Friend]]) {
 		// println(network)
 		for( (k, _) <- network) {
 			var n0 = graphModel.factory().newNode(k.uid)
-			n0.getNodeData().setLabel(k.name)
+			n0.getNodeData().setLabel("和谐")
 			nodes(k) = n0
 			directedGraph.addNode(n0)
 		}
