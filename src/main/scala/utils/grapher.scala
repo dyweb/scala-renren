@@ -145,6 +145,20 @@ class Grapher(val network: HashMap[Friend, List[Friend]]) {
 		sizeTransformer.setMaxSize(maxSize)
 		rankingController.transform(centralityRanking,sizeTransformer)
 
+		// use layout
+		val layout = new YifanHuLayout(null, new StepDisplacement(1f));
+		layout.setGraphModel(graphModel);
+		layout.resetPropertiesValues();
+		layout.setOptimalDistance(200f);
+		layout.initAlgo();
+
+		var i = 0
+		while (i < 100 && layout.canAlgo()) {
+			i = i + 1
+			layout.goAlgo();
+		}
+		layout.endAlgo();
+
 		//Preview
 		model.getProperties().putValue(PreviewProperty.SHOW_NODE_LABELS, true)
 		model.getProperties().putValue(PreviewProperty.NODE_LABEL_FONT, model.getProperties().getFontValue(PreviewProperty.NODE_LABEL_FONT).deriveFont(8))
