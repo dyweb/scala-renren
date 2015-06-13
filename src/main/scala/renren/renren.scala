@@ -96,7 +96,7 @@ class Renren(val username: String, val pwd: String, val reporter: Reporter, val 
 		httpParser.getSchoolRank(friends)
 	}
 
-	def run() = {
+	def runFriendNetwork() = {
 		login
 
 		friends = getFriendList()
@@ -104,7 +104,13 @@ class Renren(val username: String, val pwd: String, val reporter: Reporter, val 
 		network.initialize(friends)
 		// 4: The thread count
 		network.parseFriend(this, 4)
-		network.exportGraph
 		dumper.close
+	}
+
+	def runSixDegreeVerifier() = {
+		login
+
+		val sdv = new SixDegreeVerifier(reporter, this)
+		sdv.findShortestPath(uid, "75511553")
 	}
 }
