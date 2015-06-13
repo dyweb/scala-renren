@@ -16,7 +16,7 @@ object Main {
 		val pwd = parser.getPwd()
 
 		val renren = new Renren(username, pwd, reporter, dumper)
-		renren.run
+		renren.runSixDegreeVerifier
 
 	}
 }
