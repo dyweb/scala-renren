@@ -59,7 +59,7 @@ class FriendNetwork(reporter: Reporter) extends NetworkBase(reporter: Reporter) 
 	class SuperActor(thread: Int, var list: List[Friend], renren: Renren) extends Actor {
 		var actorList: List[FriendActor] = List()
 		var flag = true
-		var times = 300
+		var times = -1
 		for( i <- 1 to thread) {
 			reporter.info("create " + i.toString + "th actor")
 			val actor = new FriendActor(renren, this)
