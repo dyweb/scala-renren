@@ -23,6 +23,8 @@ package utils
 import java.awt.Color
 import java.io.File
 import java.io.IOException
+import java.awt.BorderLayout
+import javax.swing.JFrame
 import org.gephi.data.attributes.api.AttributeColumn
 import org.gephi.data.attributes.api.AttributeController
 import org.gephi.data.attributes.api.AttributeModel
@@ -38,9 +40,6 @@ import org.gephi.io.importer.api.ImportController
 import org.gephi.io.processor.plugin.DefaultProcessor
 import org.gephi.layout.plugin.force.StepDisplacement
 import org.gephi.layout.plugin.force.yifanHu.YifanHuLayout
-import org.gephi.preview.api.PreviewController
-import org.gephi.preview.api.PreviewModel
-import org.gephi.preview.api.PreviewProperty
 import org.gephi.preview.types.EdgeColor
 import org.gephi.project.api.ProjectController
 import org.gephi.project.api.Workspace
@@ -52,6 +51,12 @@ import org.gephi.ranking.plugin.transformer.AbstractSizeTransformer
 import org.gephi.statistics.plugin.GraphDistance
 import org.openide.util.Lookup
 import org.gephi.io.exporter.preview._
+import org.gephi.io.importer.api.Container
+import org.gephi.io.importer.api.ImportController
+import org.gephi.io.processor.plugin.DefaultProcessor
+import org.gephi.preview.api._
+import org.gephi.preview.types.DependantOriginalColor
+import processing.core.PApplet
 
 import scala.collection.{ mutable, immutable, generic }
 import scala.collection.mutable.{ HashMap }
@@ -90,7 +95,8 @@ class Grapher(val network: HashMap[Friend, List[Friend]]) {
 		//Get models and controllers for this new workspace - will be useful later
 		var attributeModel = Lookup.getDefault().lookup(classOf[AttributeController]).getModel()
 		var graphModel = Lookup.getDefault().lookup(classOf[GraphController]).getModel()
-		var model = Lookup.getDefault().lookup(classOf[PreviewController]).getModel()
+		var previewController = Lookup.getDefault().lookup(classOf[PreviewController])
+		var model = previewController.getModel()
 		var filterController = Lookup.getDefault().lookup(classOf[FilterController])
 		var rankingController = Lookup.getDefault().lookup(classOf[RankingController])
 
@@ -100,7 +106,7 @@ class Grapher(val network: HashMap[Friend, List[Friend]]) {
 		// println(network)
 		for( (k, _) <- network) {
 			var n0 = graphModel.factory().newNode(k.uid)
-			n0.getNodeData().setLabel(k.name)
+			// n0.getNodeData().setLabel(k.name)
 			nodes(k) = n0
 			directedGraph.addNode(n0)
 		}
@@ -161,21 +167,34 @@ class Grapher(val network: HashMap[Friend, List[Friend]]) {
 
 		//Preview
 		model.getProperties().putValue(PreviewProperty.SHOW_NODE_LABELS, true)
-		model.getProperties().putValue(PreviewProperty.NODE_LABEL_FONT, model.getProperties().getFontValue(PreviewProperty.NODE_LABEL_FONT).deriveFont(8))
+		// model.getProperties().putValue(PreviewProperty.NODE_LABEL_FONT, model.getProperties().getFontValue(PreviewProperty.NODE_LABEL_FONT).deriveFont(8))
+		model.getProperties().putValue(PreviewProperty.EDGE_CURVED, false)
+		previewController.refreshPreview()
 
-		//Export
-		// try { 
-			var ec = Lookup.getDefault().lookup(classOf[ExportController])
-			val pe = new PNGExporter
-			// pe.setHeight(height)
-			// pe.setWidth(width)
-			// pe.setMargin(0)
-			ec.exportFile(new File("headless_simple.png"), pe)
-			val ps = new SVGExporter
-			ec.exportFile(new File("headless_simple.svg"), ps)
-		// } catch {
-		//   case e: Exception => 
-		// }
+		//New Processing target, get the PApplet
+        var target = previewController.getRenderTarget(RenderTarget.PROCESSING_TARGET).asInstanceOf[ProcessingTarget]
+        var applet = target.getApplet()
+        applet.init()
+
+        //Refresh the preview and reset the zoom
+        previewController.render(target)
+        target.refresh()
+        target.resetZoom()
+
+        //Add the applet to a JFrame and display
+        var frame = new JFrame("Test Preview")
+        frame.setLayout(new BorderLayout())
+        
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
+        frame.add(applet, BorderLayout.CENTER)
+        
+        frame.pack()
+        frame.setVisible(true)
+		var ec = Lookup.getDefault().lookup(classOf[ExportController])
+		val pe = new PNGExporter
+		ec.exportFile(new File("headless_simple.png"), pe)
+		val ps = new SVGExporter
+		ec.exportFile(new File("headless_simple.svg"), ps)
 
 	}
 }

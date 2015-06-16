@@ -100,21 +100,6 @@ class FriendNetwork(reporter: Reporter) extends NetworkBase(reporter: Reporter) 
 			}
 		}
 	}
-
-	// try to use List.par.map, but failed because of the httpclient connection
-	// def mapFunc(renren: Renren, ele: Friend) = {
-	// 	var workUid = ele.uid
-	// 	// tricky
-	// 	if (renren.getFriendCount(workUid) < 1000) {
-	// 		var friList: List[Friend] = me.translate2Friend(renren.getFriendList(workUid))
-	// 		for( friend <- friList) {
-	// 			if (me.network.exists(_._1 == friend)) {
-	// 				me.network(ele) = friend :: me.network(ele)
-	// 			}
-	// 		}
-	// 	}
-	// 	ele
-	// }
 	
 	// parse all the friend you have and get the network
 	def parseFriend(renren: Renren, thread: Int): Unit = {
