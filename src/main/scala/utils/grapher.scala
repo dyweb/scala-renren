@@ -39,7 +39,7 @@ import org.gephi.io.importer.api.EdgeDefault
 import org.gephi.io.importer.api.ImportController
 import org.gephi.io.processor.plugin.DefaultProcessor
 import org.gephi.layout.plugin.force.StepDisplacement
-import org.gephi.layout.plugin.force.yifanHu.YifanHuLayout
+import org.gephi.layout.plugin.forceAtlas.ForceAtlasLayout
 import org.gephi.preview.types.EdgeColor
 import org.gephi.project.api.ProjectController
 import org.gephi.project.api.Workspace
@@ -60,7 +60,9 @@ import processing.core.PApplet
 
 import scala.collection.{ mutable, immutable, generic }
 import scala.collection.mutable.{ HashMap }
+
 import renren.Friend
+import utils.Reporters._
 
 /**
  * This demo shows several actions done with the toolkit, aiming to do a complete chain,
@@ -80,13 +82,14 @@ import renren.Friend
  * 
  * @author Mathieu Bastian
  */
-class Grapher(val network: HashMap[Friend, List[Friend]]) {
+class Grapher(val network: HashMap[Friend, List[Friend]], reporter: Reporter) {
 	val minSize = 6
 	val maxSize = 20
 	val height = 1080
 	val width = 1920
 
 	def script(): Unit = {
+		reporter.info("Begin to draw")
 		//Init a project - and therefore a workspace
 		var pc = Lookup.getDefault().lookup(classOf[ProjectController])
 		pc.newProject()
@@ -129,8 +132,9 @@ class Grapher(val network: HashMap[Friend, List[Friend]]) {
 
 		//See visible graph stats
 		var graphVisible = graphModel.getUndirectedGraphVisible()
-		System.out.println("Nodes: " + graphVisible.getNodeCount())
-		System.out.println("Edges: " + graphVisible.getEdgeCount())
+		reporter.info("---The Graph Info---")
+		reporter.info("Nodes: " + graphVisible.getNodeCount())
+		reporter.info("Edges: " + graphVisible.getEdgeCount())
 
 		//Get Centrality
 		var distance = new GraphDistance()
@@ -152,18 +156,19 @@ class Grapher(val network: HashMap[Friend, List[Friend]]) {
 		rankingController.transform(centralityRanking,sizeTransformer)
 
 		// use layout
-		val layout = new YifanHuLayout(null, new StepDisplacement(1f));
-		layout.setGraphModel(graphModel);
-		layout.resetPropertiesValues();
-		layout.setOptimalDistance(200f);
-		layout.initAlgo();
+		reporter.info("Run layout algorithm")
+		val layout = new ForceAtlasLayout(null)
+		layout.setGraphModel(graphModel)
+		layout.resetPropertiesValues()
+		layout.initAlgo()
 
 		var i = 0
-		while (i < 100 && layout.canAlgo()) {
+		while (i < 1000 && layout.canAlgo()) {
 			i = i + 1
-			layout.goAlgo();
+			layout.goAlgo()
 		}
-		layout.endAlgo();
+		layout.endAlgo()
+		reporter.info("Layout end")
 
 		//Preview
 		model.getProperties().putValue(PreviewProperty.SHOW_NODE_LABELS, true)
@@ -182,7 +187,8 @@ class Grapher(val network: HashMap[Friend, List[Friend]]) {
         target.resetZoom()
 
         //Add the applet to a JFrame and display
-        var frame = new JFrame("Test Preview")
+        reporter.info("Build JFrame")
+        var frame = new JFrame("Renren Friend Relationship")
         frame.setLayout(new BorderLayout())
         
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)

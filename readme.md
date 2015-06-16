@@ -2,19 +2,14 @@
 
 scarenren是一个基于scala的人人分析工具
 
-## 目的
-
-帮同学写的一工具，用完了，就开源了。
-
 ## 构建
 
 项目使用sbt构建，构建环境为`jdk1.7 scala2.11 sbt 0.13.8`
 
-## 功能
+## 输出
 
 1. 好友学校统计，在生成的`Output-Data.txt`中
-2. 好友关系图，在生成的`headless_simple.png`和`headless_simple.svg`中
-3. 待续
+2. 好友关系图，以JFrame的形式展示，并生成在`headless_simple.png`和`headless_simple.svg`中
 
 ## 使用
 

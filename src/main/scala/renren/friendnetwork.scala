@@ -119,7 +119,7 @@ class FriendNetwork(reporter: Reporter) extends NetworkBase(reporter: Reporter) 
 	}
 
 	def exportGraph() = {
-		val grapher = new Grapher(network)
+		val grapher = new Grapher(network, reporter)
 		grapher.script()
 	}
 }
