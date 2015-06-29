@@ -58,9 +58,7 @@ PS: gephi在导出的时候，会有报错，形如
 	<img src="http://gaocegege.com/scala-renren/example.png" height="450">
 </figure>
 
-在根据好友列表生成好友关系图的时候，使用了Actor来并发地处理请求，但是因为从未接触过这种线程模型，代码不太靠谱，有时候会有一些bug，这里的建议是多次执行以期望能得到成功的一次= =
-
-另外在画图的时候使用了gephi-toolkit，现行的情况是，好友的关系越多，边的颜色越偏红，节点也越大，本身就geohi而言，其功能非常丰富，这方面还有很大的扩展空间。
+另外在画图的时候使用了gephi-toolkit，现行的情况是，根据[Modularity](https://en.wikipedia.org/wiki/Modularity_\(networks\))来决定节点的颜色，节点度来决定节点的大小。
 
 ## 未完成
 
