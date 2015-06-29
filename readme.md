@@ -8,8 +8,28 @@ scarenren是一个基于scala的人人分析工具
 
 ## 输出
 
-1. 好友学校统计，在生成的`Output-Data.txt`中
-2. 好友关系图，以JFrame的形式展示，并生成在`headless_simple.png`和`headless_simple.svg`中
+### 好友学校统计
+
+在生成的`Output-Data.txt`中
+
+### 好友关系图
+
+以JFrame的形式展示，并生成在`headless_simple.png`和`headless_simple.svg`中
+
+### 文本格式的好友关系
+
+在`network.txt`中，是语言无关的，可以基于该文本做很多事情。其格式为
+
+	-Friend(uid, location, name, url)  // 1
+	--Friend(uid, location, name, url) // 2
+	--Friend(uid, location, name, url) // 3
+	...
+	-Friend(uid, location, name, url)  // 2
+	--Friend(uid, location, name, url) // 5
+
+其中-代表是节点，--代表由之前-节点指向该--节点的边。比如在此例中，行1为一个节点，行2代表一个由行1节点指向行2节点的一条边。
+
+PS：存储方式略显拙计。
 
 ## 使用
 

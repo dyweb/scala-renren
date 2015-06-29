@@ -49,6 +49,7 @@ import org.gephi.ranking.api.Transformer
 import org.gephi.ranking.plugin.transformer.AbstractColorTransformer
 import org.gephi.ranking.plugin.transformer.AbstractSizeTransformer
 import org.gephi.statistics.plugin.GraphDistance
+import org.gephi.statistics.plugin.Modularity
 import org.openide.util.Lookup
 import org.gephi.io.exporter.preview._
 import org.gephi.io.importer.api.Container
@@ -60,6 +61,7 @@ import processing.core.PApplet
 
 import scala.collection.{ mutable, immutable, generic }
 import scala.collection.mutable.{ HashMap }
+import scala.util.Random
 
 import renren.Friend
 import utils.Reporters._
@@ -83,10 +85,40 @@ import utils.Reporters._
  * @author Mathieu Bastian
  */
 class Grapher(val network: HashMap[Friend, List[Friend]], reporter: Reporter) {
-	val minSize = 6
-	val maxSize = 20
+	val minSize = 10
+	val maxSize = 50
 	val height = 1080
 	val width = 1920
+	val colorMap: HashMap[Integer, Color] = new HashMap()
+
+	def generateRandomColor(mix: Color): Color = {
+		var random = new Random()
+		var red = random.nextInt(256)
+		var green = random.nextInt(256)
+		var blue = random.nextInt(256)
+
+		// mix the color
+		red = (red + mix.getRed()) / 2
+		green = (green + mix.getGreen()) / 2
+		blue = (blue + mix.getBlue()) / 2
+
+		var color = new Color(red, green, blue)
+		return color
+	}
+
+	def fillMap() = {
+		var mix = new Color(0, 0, 0)
+		for( i <- 0 to 100) {
+			colorMap(i) = generateRandomColor(mix)
+			mix = colorMap(i)
+		}
+	}
+
+	fillMap()
+
+	def rgbInt2Float(a: Integer): Float = {
+		return a.toFloat / 256f
+	}
 
 	def script(): Unit = {
 		reporter.info("Begin to draw")
@@ -109,7 +141,7 @@ class Grapher(val network: HashMap[Friend, List[Friend]], reporter: Reporter) {
 		// println(network)
 		for( (k, _) <- network) {
 			var n0 = graphModel.factory().newNode(k.uid)
-			// n0.getNodeData().setLabel(k.name)
+			n0.getNodeData().setLabel(k.name)
 			nodes(k) = n0
 			directedGraph.addNode(n0)
 		}
@@ -142,18 +174,28 @@ class Grapher(val network: HashMap[Friend, List[Friend]], reporter: Reporter) {
 		distance.execute(graphModel, attributeModel)
 
 		//Rank color by Degree
-		var degreeRanking = rankingController.getModel().getRanking(Ranking.NODE_ELEMENT, Ranking.DEGREE_RANKING)
-		var colorTransformer = rankingController.getModel().getTransformer(Ranking.NODE_ELEMENT, Transformer.RENDERABLE_COLOR).asInstanceOf[AbstractColorTransformer[Ranking[AttributeColumn]]]
-		colorTransformer.setColors(Array(new Color(0xFEF0D9), new Color(0xB30000)))
-		rankingController.transform(degreeRanking,colorTransformer)
+		// var degreeRanking = rankingController.getModel().getRanking(Ranking.NODE_ELEMENT, Ranking.DEGREE_RANKING)
+		// var colorTransformer = rankingController.getModel().getTransformer(Ranking.NODE_ELEMENT, Transformer.RENDERABLE_COLOR).asInstanceOf[AbstractColorTransformer[Ranking[AttributeColumn]]]
+		// colorTransformer.setColors(Array(new Color(0xFEF0D9), new Color(0xB30000)))
+		// rankingController.transform(degreeRanking,colorTransformer)
 
 		//Rank size by centrality
 		var centralityColumn = attributeModel.getNodeTable().getColumn(GraphDistance.BETWEENNESS)
-		var centralityRanking = rankingController.getModel().getRanking(Ranking.NODE_ELEMENT, centralityColumn.getId())
+		var centralityRanking = rankingController.getModel().getRanking(Ranking.NODE_ELEMENT, centralityColumn.getId)
 		var sizeTransformer = rankingController.getModel().getTransformer(Ranking.NODE_ELEMENT, Transformer.RENDERABLE_SIZE).asInstanceOf[AbstractSizeTransformer[Ranking[AttributeColumn]]]
 		sizeTransformer.setMinSize(minSize)
 		sizeTransformer.setMaxSize(maxSize)
 		rankingController.transform(centralityRanking,sizeTransformer)
+
+		// Rank color by modularity
+		var modularity = new Modularity
+		modularity.execute(graphModel, attributeModel)
+		var modularityColumn = attributeModel.getNodeTable().getColumn(Modularity.MODULARITY_CLASS)
+		for( node <- graphModel.getDirectedGraph.getNodes.toArray) {
+			var rgb = node.getNodeData().getAttributes().getValue(modularityColumn.getIndex()).asInstanceOf[Int]
+			var colorBuf = colorMap(rgb)
+			node.getNodeData().setColor(rgbInt2Float(colorBuf.getRed), rgbInt2Float(colorBuf.getGreen), rgbInt2Float(colorBuf.getBlue))
+		}
 
 		// use layout
 		reporter.info("Run layout algorithm")
@@ -170,9 +212,14 @@ class Grapher(val network: HashMap[Friend, List[Friend]], reporter: Reporter) {
 		layout.endAlgo()
 		reporter.info("Layout end")
 
+		// Test: get all the AttributeColumn
+		// for (col <- attributeModel.getNodeTable().getColumns()) {
+  		// println(col)
+		// }
+
 		//Preview
 		model.getProperties().putValue(PreviewProperty.SHOW_NODE_LABELS, true)
-		// model.getProperties().putValue(PreviewProperty.NODE_LABEL_FONT, model.getProperties().getFontValue(PreviewProperty.NODE_LABEL_FONT).deriveFont(8))
+		model.getProperties().putValue(PreviewProperty.NODE_LABEL_FONT, model.getProperties().getFontValue(PreviewProperty.NODE_LABEL_FONT).deriveFont(8))
 		model.getProperties().putValue(PreviewProperty.EDGE_CURVED, false)
 		previewController.refreshPreview()
 
