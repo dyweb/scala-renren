@@ -1,7 +1,7 @@
 package utils
 
 import scala.tools.nsc.Global
-import scala.reflect.internal.util.{Position, NoPosition, FakePos}
+import scala.reflect.internal.util.{ Position, NoPosition, FakePos }
 
 object Reporters {
 
@@ -13,15 +13,15 @@ object Reporters {
     def formatTypeTitle(typ: MsgType) = {
       typ match {
         case FatalMsg =>
-          Console.RED+Console.BOLD+typ.title+Console.RESET
+          Console.RED + Console.BOLD + typ.title + Console.RESET
         case ErrorMsg =>
-          Console.RED+typ.title+Console.RESET
+          Console.RED + typ.title + Console.RESET
         case WarningMsg =>
-          Console.YELLOW+typ.title+Console.RESET
+          Console.YELLOW + typ.title + Console.RESET
         case NormalMsg =>
-          Console.MAGENTA+typ.title+Console.RESET
+          Console.MAGENTA + typ.title + Console.RESET
         case TitleMsg =>
-          Console.BLUE+Console.BOLD+typ.title+Console.RESET
+          Console.BLUE + Console.BOLD + typ.title + Console.RESET
         case DebugMsg =>
           typ.title
       }
@@ -71,22 +71,21 @@ object Reporters {
   case class Msg(lines: Seq[String], typ: MsgType) {
     def content = lines.mkString("\n")
 
-    val firstLine  = lines.head
+    val firstLine = lines.head
     val otherLines = lines.tail
   }
 
   import language.implicitConversions
 
   implicit def posToOptPos(p: Position): Option[Position] = Some(p)
-  implicit def strToMsgLines(m: String): MsgLines         = MsgLines(Seq(m))
+  implicit def strToMsgLines(m: String): MsgLines = MsgLines(Seq(m))
   implicit def seqStrToMsgLines(m: Seq[String]): MsgLines = MsgLines(m)
 
-
   trait ReporterHandler {
-    def open() { }
-    def incIndent() { }
-    def decIndent() { }
-    def close() { }
+    def open() {}
+    def incIndent() {}
+    def decIndent() {}
+    def close() {}
 
     def printMessage(msg: Msg, optPos: Option[Position])
     def printText(content: String)
@@ -94,31 +93,31 @@ object Reporters {
 
   class ConsoleReporterHandler() extends ReporterHandler {
     var currentIndent: Int = 0;
-    val indentStep         = 8;
+    val indentStep = 8;
 
     val formatter = new ConsoleFormatter
 
     protected def posToString(optPos: Option[Position]): String = {
       optPos match {
-          case Some(posIn) =>
-            val pos = if (posIn eq null) NoPosition
-                 else if (posIn.isDefined) posIn.inUltimateSource(posIn.source)
-                 else posIn
+        case Some(posIn) =>
+          val pos = if (posIn eq null) NoPosition
+          else if (posIn.isDefined) posIn.inUltimateSource(posIn.source)
+          else posIn
 
-            pos match {
-              case FakePos(fmsg) =>
-                "?:? ("+fmsg+"): "
-              case NoPosition =>
-                ""
+          pos match {
+            case FakePos(fmsg) =>
+              "?:? (" + fmsg + "): "
+            case NoPosition =>
+              ""
 
-              case _ =>
-                val file = pos.source.file
+            case _ =>
+              val file = pos.source.file
 
-                file.path+":"+pos.line+": "
-            }
+              file.path + ":" + pos.line + ": "
+          }
 
-           case None =>
-            ""
+        case None =>
+          ""
       }
     }
 
@@ -132,31 +131,31 @@ object Reporters {
     override def printMessage(msg: Msg, optPos: Option[Position]) {
       val strPos = posToString(optPos)
 
-      val indent  = " "*currentIndent
-      val padding = " "*(MsgType.maxTitleSize-msg.typ.title.size)
+      val indent = " " * currentIndent
+      val padding = " " * (MsgType.maxTitleSize - msg.typ.title.size)
 
-      printText(formatter.formatTypeTitle(msg.typ)+padding+": "+indent+msg.firstLine+"\n")
+      printText(formatter.formatTypeTitle(msg.typ) + padding + ": " + indent + msg.firstLine + "\n")
       for (line <- msg.otherLines) {
-        printText(" "*(MsgType.maxTitleSize+(": "+indent).length) + line+"\n")
+        printText(" " * (MsgType.maxTitleSize + (": " + indent).length) + line + "\n")
       }
 
       optPos match {
-          case Some(posIn) if posIn ne null=>
-            val pos = if (posIn.isDefined) posIn.inUltimateSource(posIn.source)
-                      else posIn
+        case Some(posIn) if posIn ne null =>
+          val pos = if (posIn.isDefined) posIn.inUltimateSource(posIn.source)
+          else posIn
 
-            pos match {
-              case FakePos(fmsg) =>
-              case NoPosition =>
-              case _ =>
-                printSourceLine(strPos, pos)
-            }
-          case _ =>
+          pos match {
+            case FakePos(fmsg) =>
+            case NoPosition =>
+            case _ =>
+              printSourceLine(strPos, pos)
+          }
+        case _ =>
       }
     }
 
     def printSourceLine(prefix: String, pos: Position) = {
-      printText(prefix+pos.lineContent.stripLineEnd+"\n")
+      printText(prefix + pos.lineContent.stripLineEnd + "\n")
       if (pos.isDefined) {
         printText((" " * (pos.column - 1 + prefix.length) + "^\n"))
       }
@@ -207,10 +206,10 @@ object Reporters {
       dispatch(_.decIndent)
     }
 
-    def msg(m: MsgLines,   optPos: Option[Position] = None) =
+    def msg(m: MsgLines, optPos: Option[Position] = None) =
       printMessage(Msg(m.lines, NormalMsg), optPos)
 
-    def info(m: MsgLines,  optPos: Option[Position] = None) =
+    def info(m: MsgLines, optPos: Option[Position] = None) =
       printMessage(Msg(m.lines, NormalMsg), optPos)
 
     def error(m: MsgLines, optPos: Option[Position] = None) =
@@ -224,14 +223,13 @@ object Reporters {
     def debug(m: MsgLines, optPos: Option[Position] = None) =
       printMessage(Msg(m.lines, DebugMsg), optPos)
 
-    def warn(m: MsgLines,  optPos: Option[Position] = None) =
+    def warn(m: MsgLines, optPos: Option[Position] = None) =
       printMessage(Msg(m.lines, WarningMsg), optPos)
 
     def title(m: String) {
       printMessage(Msg(Seq(m), TitleMsg), None)
     }
   }
-
 
   case class CompilerReporterPassThrough(as: (String, Position) => Unit) extends scala.tools.nsc.reporters.Reporter {
     protected def info0(pos: Position, msg: String, severity: Severity, force: Boolean) {
