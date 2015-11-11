@@ -65,3 +65,7 @@ PS: gephi在导出的时候，会有报错，形如
 * 优化friendnetwork.scala中的marshal，不需要读入文件时都存入内存，边读入边遍历，可使用解释器模式
 * grapher.scala优化画图风格
 * actor使用到了外部mutable的变量，会有未定义的行为，以后改善。。。
+* 
+### PS
+
+Code Style在现在看来极其差劲。。。大家将就着看看吧。。
